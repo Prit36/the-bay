@@ -10,9 +10,9 @@ import { createBalloon } from "./balloon.js";
 import { createPost } from "./post.js";
 import { createSound } from "./sound.js";
 import { U, stylize, toonish } from "./style.js";
+import { projects } from "./projects.js";
 
-// The bay from the banner, walkable. It keeps Surat's hours by default, the
-// way the banner does; the scroll wheel turns them.
+// The bay keeps Surat's hours by default; the scroll wheel turns them.
 
 const $ = (id) => document.getElementById(id);
 const canvas = $("world");
@@ -351,7 +351,7 @@ const parasol = new THREE.Group();
 let parasolOpen = 0;
 
 // ------------------------------------------------------------------ the lanterns
-// One for each project on the page. Their words come from the page itself.
+// Each lantern carries a project from this world's own catalog.
 const SPOTS = {
   glyph: () => [...places.glyph, 0],
   "pm2-native": () => { const [x, , z] = places.beachBoat; return [x + 2.6, heightAt(x + 2.6, z + 0.8), z + 0.8, 0]; },
@@ -365,24 +365,6 @@ const SPOTS = {
   argus: () => [LH.x - 2.4, LH.gallery, LH.z + 0.6, 0.6],
   whistle: () => [...places.islet, 0],
 };
-const FALLBACK = [
-  ["fuelmate", "FuelMate"], ["pm2", "PM2 Log Analyzer"], ["pdf-compressor", "PDF Compressor"], ["pm2-native", "PM2 Native"],
-  ["jpegview", "JPEGView"], ["glyph", "Glyph"], ["sonograph", "Sonograph"], ["bounce", "Bounce"], ["whistle", "Whistle"],
-  ["quarry", "Quarry"], ["argus", "Argus"],
-].map(([key, name]) => ({ key, name, stack: "", detail: "", href: "https://github.com/Prit36" }));
-const projects = await fetch("../index.html").then((r) => r.text()).then((html) => {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  const list = [...doc.querySelectorAll(".work")].map((li) => {
-    const a = li.querySelector(".title a");
-    return {
-      key: li.dataset.project, name: a?.textContent.trim() || li.dataset.project,
-      stack: li.querySelector(".stack")?.textContent.trim() || "", detail: li.dataset.detail || "",
-      href: a?.href || "https://github.com/Prit36", live: li.querySelector(".live")?.href,
-    };
-  }).filter((p) => SPOTS[p.key]);
-  return list.length ? list : FALLBACK;
-}).catch(() => FALLBACK);
-
 let litKeys = new Set();
 try { litKeys = new Set(JSON.parse(localStorage.getItem("world-lanterns") || "[]")); } catch { /* storage is optional */ }
 const saveLit = () => { try { localStorage.setItem("world-lanterns", JSON.stringify([...litKeys])); } catch { /* storage is optional */ } };
@@ -1299,7 +1281,7 @@ function startFinale() {
   setTimeout(() => fireworks.show(SHOW.x, SHOW.z, 30, 0.9), 9000);
   setTimeout(() => showCard("all eleven", "The bay is lit",
     "Every project from this year, floating over the water. Thank you for walking all the way round.",
-    `<a href="../" style="color:inherit">back to the page</a> · <a href="https://github.com/Prit36" target="_blank" rel="noopener" style="color:inherit">github.com/Prit36</a>`, "https://github.com/Prit36", 20000), 5000);
+    `<a href="https://prit36.github.io/" style="color:inherit">portfolio</a> · <a href="https://github.com/Prit36/the-bay" target="_blank" rel="noopener" style="color:inherit">source</a>`, "https://github.com/Prit36/the-bay", 20000), 5000);
   $("reset").hidden = false;
 }
 // Lanterns already all lit on an earlier visit go straight to the sky.
